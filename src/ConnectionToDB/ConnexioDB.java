@@ -34,7 +34,6 @@ public class ConnexioDB {
 		
 		String taulaRestaurant = "CREATE TABLE RESTAURANT"
 								+"(id int(3) not NULL UNIQUE,"
-								+ "puntuacio float(2,2),"
 								+"constraint pkrestaurant primary key (id)"
 								+")engine=innodb;";
 		
@@ -44,6 +43,7 @@ public class ConnexioDB {
 		String taulaRelacio = "CREATE TABLE RELUSRREST"
 							  +"(usuari int(5) not NULL,"
 							  +"restaurant int(3) not NULL,"
+							  + "puntuacio decimal(5,2) not NULL,"
 							  +"constraint fk_usuari foreign key (usuari) references usuari(id),"
 							  +"constraint fk_restaurant foreign key (restaurant) references restaurant(id)"
 							  +")engine=innodb;";
@@ -81,21 +81,58 @@ public class ConnexioDB {
 	}
 	
 	
-	private static void processarFitxer(String nomFitxer) throws IOException{
+	
+	private static void guardarDadesADB(String nomF, Connection c){
+		System.out.println("Vols emmagatzemar les dades?[S/n]");
+		String op = teclat.nextLine();
+		while(!op.toLowerCase().equals("s") && !op.toLowerCase().equals("n")) {
+			System.out.println("Siusplau, posa una opció correcta. [S/n]");
+			op=teclat.nextLine();
+		}
+		
+		if(op.toLowerCase().equals("s")) {
+			System.out.println("Emmagatzemant les files a la base de dades...");
+			try {
+				processarFitxerIGuardarDadesDB(nomF, c);
+			}catch(Exception e) {
+				System.out.println(e);
+			}
+		}
+		
+		
+	}
+	
+	
+	
+	private static void processarFitxerIGuardarDadesDB(String nomFitxer, Connection conn) throws SQLException, IOException{
 		BufferedReader bIn = new BufferedReader(new FileReader(nomFitxer));
 		String linia=bIn.readLine();
-		String[] liniaT = linia.split(";");
-		int restaurants=0;
-		for(String s : liniaT)
-			restaurants++;
-		restaurants--;
-		int usuaris = 1;
-		
+		int usuari = 1;
+		int restaurant = 1;
+		boolean primerCop=true;
 		while(linia!=null) {
-			liniaT = linia.split(";");
-			//fer la magia...
-			for(int i=1; i<restaurants; i++) {
-				
+			String[] liniaT = linia.split(";");
+			if(!liniaT[0].equals("DATASET")) {
+				String emmagatzemarUsuari = "INSERT INTO USUARI(id) VALUES("+usuari+");";
+				PreparedStatement preparedStmt = conn.prepareStatement(emmagatzemarUsuari);
+				preparedStmt.execute();
+				System.out.println(emmagatzemarUsuari);
+				for(int i=1; i<=100; i++) {
+					if (primerCop) {
+						String emmagatzemarRestaurant="INSERT INTO RESTAURANT(id) VALUES("+restaurant+");";
+						PreparedStatement pStmt = conn.prepareStatement(emmagatzemarRestaurant);
+						pStmt.execute();
+						System.out.println(emmagatzemarRestaurant);
+					}	
+					String emmagatzemarRelacio="INSERT INTO RELUSRREST(usuari,restaurant,puntuacio) VALUES ("+usuari+","+restaurant+","+Float.valueOf(liniaT[i])+");";
+					PreparedStatement prepStmt = conn.prepareStatement(emmagatzemarRelacio);
+					prepStmt.execute();
+					System.out.println(emmagatzemarRelacio);
+					restaurant++;
+				}
+				usuari++;
+				restaurant=1;
+				primerCop=false;
 			}
 			linia=bIn.readLine();
 		}
@@ -113,11 +150,7 @@ public class ConnexioDB {
 		connexio = connexioDB();
 		creacioTaules(stmt, connexio);
 		
-		try {
-			processarFitxer("dataset.csv");
-		}catch(Exception e) {
-			System.out.println(e);
-		}
+		guardarDadesADB("dataset.csv", connexio);
 		
 		
 		
