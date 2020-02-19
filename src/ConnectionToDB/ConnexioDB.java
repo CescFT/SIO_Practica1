@@ -91,53 +91,106 @@ public class ConnexioDB {
 		}
 		
 		if(op.toLowerCase().equals("s")) {
-			System.out.println("Emmagatzemant les files a la base de dades...");
+			System.out.println("Quin fitxer vols generar?");
+			System.out.println("1. Usuaris");
+			System.out.println("2. Restaurants");
+			System.out.println("3. Relació usuaris - restaurants");
+			
+			int op1 = Integer.valueOf(teclat.nextLine());
+			
+			while(op1!=1 && op1!=2 && op1!=3) {
+				System.out.println("Siusplau, posa una opció correcta.");
+				System.out.println("1. Usuaris");
+				System.out.println("2. Restaurants");
+				System.out.println("3. Relació usuaris - restaurants");
+				op1=Integer.valueOf(teclat.nextLine());
+			}
+			
+			
 			try {
-				processarFitxerIGuardarDadesDB(nomF, c);
+				switch(op1) {
+				case 1:
+					fitxerUsuaris();
+					System.out.println("EXECUTA AL SERVIDOR SQL LA SEGÜENT SENTÈNCIA:");
+					System.out.println("LOAD DATA LOCAL INFILE 'abspath/usuaris.txt' INTO TABLE usuari;");
+					break;
+				case 2:
+					fitxerRestaurants();
+					System.out.println("EXECUTA AL SERVIDOR SQL LA SEGÜENT SENTÈNCIA:");
+					System.out.println("LOAD DATA LOCAL INFILE 'abspath/restaurants.txt' INTO TABLE restaurant;");
+					break;
+				case 3:
+					processarFitxerIGenerarFitxerRelacio(nomF);
+					System.out.println("EXECUTA AL SERVIDOR SQL LA SEGÜENT SENTÈNCIA:");
+					System.out.println("LOAD DATA LOCAL INFILE 'abspath/relacio.txt' INTO TABLE relusrrest CHARACTER SET UTF8 FIELDS TERMINATED BY ',' LINES TERMINATED BY '\r\n';");
+					break;
+				}
+				
 			}catch(Exception e) {
 				System.out.println(e);
 			}
+			
 		}
 		
+	}
+	
+	private static void fitxerRestaurants() throws IOException{
+		BufferedWriter bOut = new BufferedWriter(new FileWriter("restaurants.txt"));
 		
+		for(int i=1; i<=100; i++) {
+			bOut.write(String.valueOf(i));
+			bOut.newLine();
+		}
+		
+		bOut.close();
+	}
+	
+	private static void fitxerUsuaris() throws IOException{
+		BufferedWriter bOut = new BufferedWriter(new FileWriter("usuaris.txt"));
+		
+		for(int i=1; i<=73421; i++) {
+			bOut.write(String.valueOf(i));
+			bOut.newLine();
+		}
+		bOut.close();
 	}
 	
 	
 	
-	private static void processarFitxerIGuardarDadesDB(String nomFitxer, Connection conn) throws SQLException, IOException{
+	private static void processarFitxerIGenerarFitxerRelacio(String nomFitxer) throws IOException{
 		BufferedReader bIn = new BufferedReader(new FileReader(nomFitxer));
+		BufferedWriter bOut = new BufferedWriter(new FileWriter("relacio.txt"));
 		String linia=bIn.readLine();
 		int usuari = 1;
 		int restaurant = 1;
-		boolean primerCop=true;
 		while(linia!=null) {
 			String[] liniaT = linia.split(";");
 			if(!liniaT[0].equals("DATASET")) {
-				String emmagatzemarUsuari = "INSERT INTO USUARI(id) VALUES("+usuari+");";
-				PreparedStatement preparedStmt = conn.prepareStatement(emmagatzemarUsuari);
-				preparedStmt.execute();
-				System.out.println(emmagatzemarUsuari);
-				for(int i=1; i<=100; i++) {
-					if (primerCop) {
-						String emmagatzemarRestaurant="INSERT INTO RESTAURANT(id) VALUES("+restaurant+");";
-						PreparedStatement pStmt = conn.prepareStatement(emmagatzemarRestaurant);
-						pStmt.execute();
-						System.out.println(emmagatzemarRestaurant);
-					}	
-					String emmagatzemarRelacio="INSERT INTO RELUSRREST(usuari,restaurant,puntuacio) VALUES ("+usuari+","+restaurant+","+Float.valueOf(liniaT[i])+");";
-					PreparedStatement prepStmt = conn.prepareStatement(emmagatzemarRelacio);
-					prepStmt.execute();
-					System.out.println(emmagatzemarRelacio);
-					restaurant++;
-				}
-				usuari++;
-				restaurant=1;
-				primerCop=false;
+					String sortida=String.valueOf(usuari)+",";
+					for(restaurant=1; restaurant<=100; restaurant++) {
+						if(restaurant==1) {
+							sortida+=String.valueOf(restaurant)+",";
+							sortida+=String.valueOf(liniaT[restaurant]);
+							System.out.println(sortida);
+							bOut.write(sortida);
+						}
+						
+						if(restaurant>1) {
+							sortida=String.valueOf(usuari)+","+String.valueOf(restaurant)+","+String.valueOf(liniaT[restaurant]);
+							System.out.println(sortida);
+							bOut.write(sortida);
+						}
+						bOut.newLine();
+					}
+					restaurant=1;
+					usuari++;
 			}
+			
 			linia=bIn.readLine();
 		}
 		
 		bIn.close();
+		bOut.close();
 	}
 	
 	
@@ -146,11 +199,24 @@ public class ConnexioDB {
 		Connection connexio=null;
 		Statement stmt=null;
 		ResultSet rs;
-		
 		connexio = connexioDB();
-		creacioTaules(stmt, connexio);
+		System.out.println("Vols fer les inicialitzacions de la base de dades? (crear taules i generar fitxers auxiliars que permetin inserir informació en la bd) [S/n]");
+		String op=teclat.nextLine();
+		while(!op.toLowerCase().equals("s") && !op.toLowerCase().equals("n")) {
+			System.out.println("Siusplau, posa una opció correcta.[S/n]");
+			op=teclat.nextLine();
+		}
 		
-		guardarDadesADB("dataset.csv", connexio);
+		
+		if(op.toLowerCase().equals("s"))
+		{
+			creacioTaules(stmt, connexio);
+			guardarDadesADB("dataset.csv", connexio);
+		}
+		
+		//FER L'ESTUDI LOL 
+		
+		
 		
 		
 		
