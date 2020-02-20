@@ -256,6 +256,9 @@ public class ConnexioDB {
 			
 			//System.out.println(estudi.relacioUsuariPuntuacioMesBaixaRestaurant());
 			
+			//System.out.println(estudi.usuariAmbMesRestaurantsVisitats());
+			
+			//System.out.println(estudi.usuariQueVotaMillor());
 			
 		}catch(Exception e) {
 			System.out.println(e);
