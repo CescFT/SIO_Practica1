@@ -2,7 +2,8 @@ package ConnectionToDB;
 
 import java.io.*;
 import java.sql.*;
-import java.util.Scanner;
+import Estudi.*;
+import java.util.*;
 
 public class ConnexioDB {
 	
@@ -194,11 +195,25 @@ public class ConnexioDB {
 	}
 	
 	
+	private static void mitjanesCadaRestaurant(Estudi e) throws Exception{
+		List<Double> mitjanes = e.mitjanaPuntuacioCadaRestaurant();
+		System.out.println("RESTAURANT\t\tPUNTUACIO");
+		int i=1;
+		
+		for(Double d:mitjanes) {
+			System.out.println(i+"\t\t"+d);
+			i++;
+		}
+		
+		
+	}
+	
+	
+	
 	public static void main (String[] args) {
 		
 		Connection connexio=null;
 		Statement stmt=null;
-		ResultSet rs;
 		connexio = connexioDB();
 		System.out.println("Vols fer les inicialitzacions de la base de dades? (crear taules i generar fitxers auxiliars que permetin inserir informació en la bd) [S/n]");
 		String op=teclat.nextLine();
@@ -214,7 +229,38 @@ public class ConnexioDB {
 			guardarDadesADB("dataset.csv", connexio);
 		}
 		
-		//FER L'ESTUDI LOL 
+		System.out.println("ESTUDI:");
+		try {
+			stmt = connexio.createStatement();
+			Estudi estudi = new Estudi(stmt);
+			
+			//System.out.println("Nombre de restaurants: "+estudi.comptarRestaurants()+" restaurants."); //100
+			
+			//System.out.println("Nombre d'usuaris: "+estudi.comptarUsuaris()+" usuaris.");//73421
+			
+			//System.out.println("Nombre de puntuacions buides(99.00): "+estudi.comptarNoVotats()+" restaurants no votats.");//3245740
+			
+			//System.out.println("Nombre de puntuacions no buides: "+estudi.comptarVotats()+" restaurants votats.");//4096360
+			
+			//System.out.println("Nombre de vots negatius [-10,-0.01]: "+estudi.comptarVotsNegatius()+" vots negatius.");//16889608
+			
+			//System.out.println("Nombre de vots neutres (0.00): "+estudi.comptarVotsZero()+" vots zero."); //12482
+			
+			//System.out.println("Nombre de vots positius (0,10]: "+estudi.comptarVotsPositius()+" vots positius."); //2394970
+			
+			//System.out.println("Puntuació mitjana que els usuaris de la mostra han donat (sumaTotalPuntuacions/totalPuntuacions):"+estudi.mitjanaTotesPuntuacions()+" de mitjana."); //0.7418716250524856
+			
+			//mitjanesCadaRestaurant(estudi);
+			
+			//System.out.println(estudi.relacioUsuariPuntuacio10Restaurant());
+			
+			//System.out.println(estudi.relacioUsuariPuntuacioMesBaixaRestaurant());
+			
+			
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+		
 		
 		
 		
