@@ -594,6 +594,58 @@ public class Estudi {
 		return resultat;
 	}
 	
+	/*
+	 * PROBABILITAT
+	 */
+	
+	/**
+	 * Mètode que retorna la probabilitat de que apareixin les puntuacions que hi ha en la base de dades. 
+	 * La probabilitat és la divisió entre els casos favorables (les vegades que ha sortit) / casos possibles(llocs on es pot posar).
+	 * FONT: https://ca.wikipedia.org/wiki/Probabilitat
+	 * @return llistat de probabilitats de cadascuna de les notes.
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<Probabilitat> probabilitatDeCadaPuntuacio() throws Exception{
+		List<Probabilitat> probabilitats = new ArrayList<Probabilitat>();
+		
+		List<Double> puntuacions = new ArrayList<Double>();
+		
+		
+		String sql="SELECT DISTINCT puntuacio"
+				+ " FROM relusrrest"
+				+ " WHERE puntuacio!=99.00";
+		ResultSet rs;
+		
+		rs = statement.executeQuery(sql);
+		
+		while(rs.next()) {
+			puntuacions.add(rs.getDouble("puntuacio"));
+		}
+		
+		Collections.sort(puntuacions);
+		
+		sql="SELECT count(*) AS casosPossibles"
+		 + " FROM relusrrest"
+		 + " WHERE puntuacio = 99.00";
+		
+		rs = statement.executeQuery(sql);
+		rs.next();
+		int casosPossibles = rs.getInt("casosPossibles");
+		
+		for(Double d : puntuacions) {
+			sql = "SELECT count(*) AS casosFavorables"
+			   + " FROM relusrrest"
+			   + " WHERE puntuacio="+d;
+			rs = statement.executeQuery(sql);
+			rs.next();
+			int casosFavorables = rs.getInt("casosFavorables");
+			probabilitats.add(new Probabilitat("Probabilitat de que surti un "+d, casosFavorables/casosPossibles));
+		}
+		
+		return probabilitats;
+	}
+	
+	
 	
 	/*
 	 * ALTRES
