@@ -260,6 +260,8 @@ public class ConnexioDB {
 			
 			//System.out.println(estudi.usuariQueVotaMillor());
 			
+			System.out.println(estudi.desviacioAbsolutaPuntuacioRestaurants());
+			
 		}catch(Exception e) {
 			System.out.println(e);
 		}

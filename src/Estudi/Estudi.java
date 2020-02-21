@@ -281,6 +281,202 @@ public class Estudi {
 	}
 	
 	/*
+	 * DESVIACIONS
+	 */
+	
+	/**
+	 * Mètode auxiliar que calcula la mediana d'un conjunt de dades passada per paràmetre.
+	 * Per tal de calcular la mediana, es necessita tenir el conjunt de dades ordenat en sentit ascendent.
+	 * Si el número de valors en la mostra és imparell, llavors la mediana és el valor que ocupa la posició n+1/2
+	 * en cas que el nombre de valors en la mostra és parell, llavors la mediana és el valor mitjà dels dos valors centrals.
+	 * @param conjuntdades Les puntuacions.
+	 * @return mediana calculada
+	 */
+	public double calcularMediana(List<Double> conjuntdades) {
+		//ordenem la llista en sentit ascendent
+		Collections.sort(conjuntdades);
+		int midaLlista = conjuntdades.size();
+		if(midaLlista%2 != 0) { 
+			//conjunt de dades imparell, la qual cosa implica que la mediana és el valor que ocupa la posició (n+1)/2
+			return conjuntdades.get((midaLlista+1)/2 -1);
+		}else {
+			//conjunt de dades parell, la qual cosa implica que la mediana és la mitjana dels dos valors centrals. (Xn/2 + Xn/2+1)/2
+			double v1=conjuntdades.get(midaLlista/2 -1);
+			double v2=conjuntdades.get((midaLlista/2));
+			return (v1+v2)/2;
+		}
+		
+	}
+	
+	/**
+	 * Mètode que calcula la desviació absoluta de puntuacions pel cas dels restaurants. Permet conèixer la distància dels punts respecte la mediana (punt mig de les dades)
+	 * Fòrmula --> Di = SUM(abs(Xi - m(X)))
+	 * On:
+	 * 	-> Xi: valor de la mostra
+	 * 	-> m(X): mediana de la mostra, per tal de veure la tendència de les dades del conjunt de valors.
+	 * FONT: https://es.wikipedia.org/wiki/Desviaci%C3%B3n_(estad%C3%ADstica)
+	 * @return llistat de desviacions absolutes
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<DesviacioAbsRestaurant> desviacioAbsolutaPuntuacioRestaurants() throws Exception{
+		String sql;
+		ResultSet rs;
+		List<Double> valors = new ArrayList<Double>();
+		List<Double> resultatIntermig = new ArrayList<Double>();
+		List<DesviacioAbsRestaurant> resultatFinal = new ArrayList<DesviacioAbsRestaurant>();
+		
+		for(int i = 1; i<=NUMRESTAURANTS;i++) {
+			sql="SELECT puntuacio FROM relusrrest WHERE restaurant="+i+" AND puntuacio!=99.00";
+			rs = statement.executeQuery(sql);
+			while(rs.next()) {
+				valors.add(rs.getDouble("puntuacio"));
+			}
+			double mediana = this.calcularMediana(valors);
+			for(Double d : valors) {
+				resultatIntermig.add(Math.abs(d - mediana));
+			}
+			double resultatF = 0;
+			for(Double d : resultatIntermig) {
+				resultatF+=d;
+			}
+			resultatFinal.add(new DesviacioAbsRestaurant(i,resultatF));
+			resultatIntermig = new ArrayList<Double>();
+		}
+		
+		return resultatFinal;
+	}
+	
+	/**
+	 * Mètode auxiliar que calcula la mitjana de valors donat un conjunt.
+	 * @param conjuntValors llistat de valors
+	 * @return mitjana
+	 */
+	public double calcularMitjana(List<Double> conjuntValors) {
+		int numValors = conjuntValors.size();
+		double numValorsD = Double.valueOf(numValors);
+		
+		double suma=0;
+		for(Double d: conjuntValors)
+			suma+=d;
+		
+		return suma/numValorsD;
+		
+	}
+	
+	/**
+	 * Mètode que retorna la desviació estàndard mostral per restaurants. S'agafa una mostra de X restaurants. El càlcul consisteix en calcular la mitjana de la mostra,
+	 * i aplicar la seguent fòrmula:
+	 * s = sqrt(1/n-1*SUM((xi-mitjana)^2))
+	 * FONT: https://es.wikipedia.org/wiki/Desviaci%C3%B3n_t%C3%ADpica#Desviaci%C3%B3n_est%C3%A1ndar_muestral_de_las_edades_de_seis_ni%C3%B1os
+	 * @return desviació estandard mostral per a el subgrup dels restaurants 1 fins al 50.
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<DesviacioEstMostralRestaurant> desviacioEstandardMostralPerRestaurants() throws Exception{
+		String sql;
+		ResultSet rs;
+		List<Double> valors = new ArrayList<Double>();
+		List<DesviacioEstMostralRestaurant> desviacioS = new ArrayList<DesviacioEstMostralRestaurant>();
+		
+		for(int i = 1; i<=50; i++) {
+			sql = "SELECT puntuacio FROM relusrrest WHERE (restaurant ="+i+"AND puntuacio!= 99.00 )";
+			rs = statement.executeQuery(sql);
+			while(rs.next()) {
+				valors.add(rs.getDouble("puntuacio"));
+			}
+			double mitjana = this.calcularMitjana(valors);
+			
+			double v=0;
+			for(Double d : valors) {
+				double base= d-mitjana;
+				v+=Math.pow((base), 2);
+			}
+			double numElems = Double.valueOf(valors.size());
+			double numElemsXLaFormula = numElems -1;
+			double a = 1/numElemsXLaFormula;
+			
+			desviacioS.add(new DesviacioEstMostralRestaurant(i, Math.sqrt(a*v)));
+		}
+		
+		return desviacioS;
+	}
+	
+	/**
+	 * Mètode que calcula la desviació estandard poblacional de les puntuacions dels 100 restaurants.
+	 * La desviació estàndard poblacional es determina calculant l'arrel quadrada de la mitjana de les desviacions dels valors restats del seu valor mitjà, elevat al quadrat.
+	 * FONT: https://es.wikipedia.org/wiki/Desviaci%C3%B3n_t%C3%ADpica#Desviaci%C3%B3n_est%C3%A1ndar_poblacional_de_las_calificaciones_de_ocho_alumnos
+	 * @return desviació estandard poblacional
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<DesviacioEstandardPoblacionalPerRestaurant> desviacioEstandardPoblacionalPerRestaurants() throws Exception{
+		
+		List<DesviacioEstandardPoblacionalPerRestaurant> resultat = new ArrayList<DesviacioEstandardPoblacionalPerRestaurant>();
+		String sql;
+		ResultSet rs;
+		
+		List<Double> valors = new ArrayList<Double>();
+		
+		for(int i=1; i<=NUMRESTAURANTS; i++) {
+			
+			sql="SELECT puntuacio FROM relusrrest WHERE(restaurant="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			while(rs.next()) {
+				valors.add(rs.getDouble("puntuacio"));
+			}
+			double mitjana = this.calcularMitjana(valors);
+			double numElems = Double.valueOf(valors.size());
+			double v = 0;
+			double base;
+			for(Double d : valors) {
+				base = d-mitjana;
+				v+= Math.pow(base, 2);
+			}
+			
+			double res = v/numElems;
+			
+			resultat.add(new DesviacioEstandardPoblacionalPerRestaurant(i, Math.sqrt(res)));
+		}
+		
+		return resultat;
+	}
+	
+	/**
+	 * Mètode que permet el càlcul de la desviació mitjana per restaurants. En estadística la desviació absoluta mitjana és la mitjana de les desviacions absolutes --> dispersió.
+	 * FONT: https://es.wikipedia.org/wiki/Desviaci%C3%B3n_media
+	 * @return llistat de les dispersions
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<DesvMitjanaRestaurant> desviacioMitjanaPerRestaurants() throws Exception{
+		
+		List<DesvMitjanaRestaurant> resultat = new ArrayList<DesvMitjanaRestaurant>();
+		List<Double> valors = new ArrayList<Double>();
+		List<Double> resIntermig = new ArrayList<Double>();
+		String sql;
+		ResultSet rs;
+		
+		for(int i=1; i<=NUMRESTAURANTS;i++) {
+			sql = "SELECT puntuacio FROM relusrrest WHERE (restaurant="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			while(rs.next()) {
+				valors.add(rs.getDouble("puntuacio"));
+			}
+			
+			double mitjana = this.calcularMitjana(valors);
+			
+			for(Double d : valors) {
+				resIntermig.add(Math.abs(d-mitjana));
+			}
+			
+			double suma = 0;
+			for(Double d : resIntermig)
+				suma+=d;
+			
+			resultat.add(new DesvMitjanaRestaurant(i, suma/Double.valueOf(valors.size())));
+		}
+		
+		return resultat;
+	}
+	
+	/*
 	 * ALTRES
 	 */
 	
