@@ -477,6 +477,125 @@ public class Estudi {
 	}
 	
 	/*
+	 * HISTOGRAMA
+	 */
+	
+	/**
+	 * Mètode que retorna el numero de vegades que surt cada nota i els ordena en intervals de dos.
+	 * [-10,-8] <-> (-8,-6] <-> (-6, -4] <-> (-4,-2] <-> (-2,0] <-> (0,2] <-> (2,4] <-> (4,6] <-> (6,8] <-> (8,10] 
+	 * @return la quantitat de vegades que hi ha la puntuació x en cadascun dels intèrvals corresponents.
+	 * @exception SQL EXCEPTION
+	 */
+	public List<Histograma> histogramaXintervalsRestaurants() throws Exception{
+		List<Histograma> resultat = new ArrayList<Histograma>();
+		String sql;
+		ResultSet rs;
+		
+		sql="SELECT count(puntuacio) AS interval"
+		 + " FROM relusrrest"
+		 + " WHERE (puntuacio!=99.00 AND"
+		 		+ " puntuacio>=-10 AND puntuacio<=-8"
+		 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval[-10, -8]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>-8 AND puntuacio<=-6"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(-8, -6]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>-6 AND puntuacio<=-4"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(-6, -4]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>-4 AND puntuacio<=-2"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(-4, -2]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>-2 AND puntuacio<=0"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(-2, 0]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>0 AND puntuacio<=2"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(0, 2]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>2 AND puntuacio<=4"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(2, 4]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>4 AND puntuacio<=6"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(4, 6]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>6 AND puntuacio<=8"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(6, 8]",rs.getInt("interval")));
+		
+		sql="SELECT count(puntuacio) AS interval"
+				 + " FROM relusrrest"
+				 + " WHERE (puntuacio!=99.00 AND"
+				 		+ " puntuacio>8 AND puntuacio<=10"
+				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+				
+		rs = statement.executeQuery(sql);
+		rs.next();
+		resultat.add(new Histograma("Interval(8, 10]",rs.getInt("interval")));
+		
+		return resultat;
+	}
+	
+	
+	/*
 	 * ALTRES
 	 */
 	
