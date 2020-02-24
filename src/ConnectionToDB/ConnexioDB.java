@@ -5,6 +5,10 @@ import java.sql.*;
 import Estudi.*;
 import java.util.*;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+ 
+
 public class ConnexioDB {
 	
 	private static Scanner teclat = new Scanner(System.in);
@@ -208,6 +212,7 @@ public class ConnexioDB {
 		
 	}
 	
+		
 	
 	
 	public static void main (String[] args) {
@@ -260,7 +265,8 @@ public class ConnexioDB {
 			
 			//System.out.println(estudi.usuariQueVotaMillor());
 			
-			System.out.println(estudi.probabilitatDeCadaPuntuacio());
+			//System.out.println(estudi.probabilitatDeCadaPuntuacio());
+			
 			
 		}catch(Exception e) {
 			System.out.println(e);

@@ -162,12 +162,12 @@ public class Estudi {
 	 */
 	public Double percentatgeRestaurantsAprobats() throws Exception{
 		int numRestaurants=this.comptarRestaurants();
-		List<Double> mitjanes = this.mitjanaPuntuacioCadaRestaurant();
+		List<MitjRestaurant> mitjanes = this.mitjanaPuntuacioCadaRestaurant();
 		
 		int aprobats=0;
 		
-		for(Double d:mitjanes) {
-			if(d>0) 
+		for(MitjRestaurant restaurant:mitjanes) {
+			if(restaurant.getMitjana()>0) 
 				aprobats++;
 		}
 		double numAprobats=Double.valueOf(aprobats);
@@ -184,12 +184,12 @@ public class Estudi {
 	 */
 	public Double percentatgeRestaurantsSuspesos() throws Exception{
 		int numRestaurants=this.comptarRestaurants();
-		List<Double> mitjanes = this.mitjanaPuntuacioCadaRestaurant();
+		List<MitjRestaurant> mitjanes = this.mitjanaPuntuacioCadaRestaurant();
 		
 		int suspesos=0;
 		
-		for(Double d:mitjanes) {
-			if(d<0) 
+		for(MitjRestaurant restaurant:mitjanes) {
+			if(restaurant.getMitjana()<0) 
 				suspesos++;
 		}
 		double numSuspesos=Double.valueOf(suspesos);
@@ -211,22 +211,11 @@ public class Estudi {
 	 * @throws Exception SQL EXCEPTION
 	 */
 	public double mitjanaTotesPuntuacions() throws Exception{
-		String sql="SELECT count(*) AS rowcount FROM relusrrest WHERE puntuacio IN (SELECT puntuacio FROM relusrrest WHERE puntuacio!=99.00)";
+		String sql="SELECT AVG(puntuacio) AS rowcount FROM relusrrest WHERE puntuacio!=99.00";
 		ResultSet rs;
 		rs=statement.executeQuery(sql);
 		rs.next();
-		
-		int totalEntrades=rs.getInt("rowcount");
-		
-		double totalEntry=Double.valueOf(totalEntrades);
-		
-		sql="SELECT SUM(puntuacio) AS rowcount FROM relusrrest WHERE puntuacio IN (SELECT puntuacio FROM relusrrest WHERE puntuacio!=99.00)";
-		rs=statement.executeQuery(sql);
-		rs.next();
-		double suma=rs.getFloat("rowcount");
-		
-		return suma/totalEntry;
-		
+		return rs.getDouble("rowcount");
 	}
 	
 	/**
@@ -234,22 +223,16 @@ public class Estudi {
 	 * @return Mitjana de cada restaurant.
 	 * @throws Exception SQL EXEPTION
 	 */
-	public List<Double> mitjanaPuntuacioCadaRestaurant() throws Exception{
+	public List<MitjRestaurant> mitjanaPuntuacioCadaRestaurant() throws Exception{ 
 		
-		List<Double> mitjanes = new ArrayList<Double>();
+		List<MitjRestaurant> mitjanes = new ArrayList<MitjRestaurant>();
 		ResultSet rs;
 		String sql;
 		for(int i=1; i<=NUMRESTAURANTS; i++) {
-			sql="SELECT count(*) AS rowcount FROM relusrrest WHERE (restaurant="+i+" AND puntuacio!=99.00)";
+			sql="SELECT AVG(puntuacio) AS rowcount FROM relusrrest WHERE (restaurant="+i+" AND puntuacio!=99.00)";
 			rs=statement.executeQuery(sql);
 			rs.next();
-			int totalP=rs.getInt("rowcount");
-			double totalPuntuacions=Double.valueOf(totalP);
-			sql= "SELECT SUM(puntuacio) AS rowcount FROM relusrrest WHERE (restaurant="+i+" AND puntuacio!=99.00)";
-			rs=statement.executeQuery(sql);
-			rs.next();
-			double suma=rs.getFloat("rowcount");
-			mitjanes.add(suma/totalPuntuacions);
+			mitjanes.add(new MitjRestaurant(i,rs.getDouble("rowcount")));
 			System.out.println(i+"de 100");
 		}
 		return mitjanes;
@@ -265,16 +248,10 @@ public class Estudi {
 		ResultSet rs;
 		String sql;
 		for(int i = 1; i<=NUMUSUARIS; i++) {
-			sql="SELECT count(*) AS visitats FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
+			sql="SELECT AVG(puntuacio) AS visitats FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
 			rs = statement.executeQuery(sql);
 			rs.next();
-			int compt=rs.getInt("visitats");
-			float comptF=Float.valueOf(compt);
-			sql="SELECT SUM(puntuacio) AS suma FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
-			rs = statement.executeQuery(sql);
-			rs.next();
-			float sum=rs.getFloat("suma");
-			mitjanesUsuaris.add(new RelUsrPunt(i,sum/comptF));
+			mitjanesUsuaris.add(new RelUsrPunt(i,rs.getDouble("visitats")));
 		}
 		Collections.sort(mitjanesUsuaris);
 		return mitjanesUsuaris;
@@ -342,26 +319,10 @@ public class Estudi {
 			resultatFinal.add(new DesviacioAbsRestaurant(i,resultatF));
 			resultatIntermig = new ArrayList<Double>();
 		}
-		
 		return resultatFinal;
 	}
 	
-	/**
-	 * Mètode auxiliar que calcula la mitjana de valors donat un conjunt.
-	 * @param conjuntValors llistat de valors
-	 * @return mitjana
-	 */
-	public double calcularMitjana(List<Double> conjuntValors) {
-		int numValors = conjuntValors.size();
-		double numValorsD = Double.valueOf(numValors);
-		
-		double suma=0;
-		for(Double d: conjuntValors)
-			suma+=d;
-		
-		return suma/numValorsD;
-		
-	}
+	
 	
 	/**
 	 * Mètode que retorna la desviació estàndard mostral per restaurants. S'agafa una mostra de X restaurants. El càlcul consisteix en calcular la mitjana de la mostra,
@@ -383,7 +344,11 @@ public class Estudi {
 			while(rs.next()) {
 				valors.add(rs.getDouble("puntuacio"));
 			}
-			double mitjana = this.calcularMitjana(valors);
+			
+			sql = "SELECT AVG(puntuacio) AS mitjana FROM relusrrest WHERE (restaurant="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			rs.next();
+			double mitjana = rs.getDouble("mitjana");
 			
 			double v=0;
 			for(Double d : valors) {
@@ -416,13 +381,15 @@ public class Estudi {
 		List<Double> valors = new ArrayList<Double>();
 		
 		for(int i=1; i<=NUMRESTAURANTS; i++) {
-			
 			sql="SELECT puntuacio FROM relusrrest WHERE(restaurant="+i+" AND puntuacio!=99.00)";
 			rs = statement.executeQuery(sql);
 			while(rs.next()) {
 				valors.add(rs.getDouble("puntuacio"));
 			}
-			double mitjana = this.calcularMitjana(valors);
+			sql = "SELECT AVG(puntuacio) AS mitjana FROM relusrrest WHERE (restaurant="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			rs.next();
+			double mitjana = rs.getDouble("mitjana");
 			double numElems = Double.valueOf(valors.size());
 			double v = 0;
 			double base;
@@ -460,7 +427,10 @@ public class Estudi {
 				valors.add(rs.getDouble("puntuacio"));
 			}
 			
-			double mitjana = this.calcularMitjana(valors);
+			sql = "SELECT AVG(puntuacio) AS mitjana FROM relusrrest WHERE (restaurant="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			rs.next();
+			double mitjana = rs.getDouble("mitjana");
 			
 			for(Double d : valors) {
 				resIntermig.add(Math.abs(d-mitjana));
@@ -625,8 +595,7 @@ public class Estudi {
 		Collections.sort(puntuacions);
 		
 		sql="SELECT count(*) AS casosPossibles"
-		 + " FROM relusrrest"
-		 + " WHERE puntuacio = 99.00";
+		 + " FROM relusrrest";
 		
 		rs = statement.executeQuery(sql);
 		rs.next();

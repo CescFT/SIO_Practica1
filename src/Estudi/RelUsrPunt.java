@@ -3,11 +3,11 @@ package Estudi;
 public class RelUsrPunt implements Comparable<RelUsrPunt>{
 	
 	private int idUsuari;
-	private float puntuacio;
+	private double puntuacio;
 	
 	public RelUsrPunt() {}
 	
-	public RelUsrPunt(int idUsuari, float puntuacio) {
+	public RelUsrPunt(int idUsuari, double puntuacio) {
 		this.idUsuari = idUsuari;
 		this.puntuacio = puntuacio;
 	}
@@ -20,11 +20,11 @@ public class RelUsrPunt implements Comparable<RelUsrPunt>{
 		this.idUsuari = idUsuari;
 	}
 
-	public float getPuntuacio() {
+	public double getPuntuacio() {
 		return puntuacio;
 	}
 
-	public void setPuntuacio(float puntuacio) {
+	public void setPuntuacio(double puntuacio) {
 		this.puntuacio = puntuacio;
 	}
 
