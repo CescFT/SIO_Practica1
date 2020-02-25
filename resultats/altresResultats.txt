@@ -1,0 +1,15 @@
+Nombre de restaurants:100
+Nombre d'usuaris:73421
+Nombre de puntuacions buides(99.00): 3245740
+Nombre de puntuacions no buides: 4096360
+Nombre de vots negatius [-10,-0.01]: 16889608
+Nombre de vots neutres (0.00):12482
+Nombre de vots positius (0,10]:2394970
+usuari amb mes restaurants visitats: L'usuari 9 ha visitat: 100 vegades.
+usuari que ha avaluat pitjor: 34628 
+percentatgeRestaurantsAprobats: 70%
+percentatgeRestaurantsSuspesos(): 30%
+mitjana de totes les puntuacions: 0.741872
+usuari que ha votat millor: 36945
+puntuacio mes alta de totes: 10.00
+puntuacio mes baixa de totes:-9.95
