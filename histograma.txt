@@ -1,0 +1,11 @@
+interval,comptador
+Interval[-10, -8],315280
+Interval(-8, -6],303972
+Interval(-6, -4],286101
+Interval(-4, -2],320062
+Interval(-2, 0],475975
+Interval(0, 2],531003
+Interval(2, 4],577716
+Interval(4, 6],504149
+Interval(6, 8],467897
+Interval(8, 10],314205

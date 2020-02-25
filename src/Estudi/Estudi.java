@@ -129,7 +129,6 @@ public class Estudi {
 			influencia.add(new InfluenciaGent(i,rs.getInt("vegades")));
 		}
 		
-		Collections.sort(influencia);
 		return influencia;
 	}
 	
@@ -149,8 +148,6 @@ public class Estudi {
 			rs.next();
 			numVisitats.add(new RestVisitats(i,rs.getInt("visitats")));
 		}
-		
-		Collections.sort(numVisitats);
 		
 		return numVisitats;
 	}
@@ -233,7 +230,6 @@ public class Estudi {
 			rs=statement.executeQuery(sql);
 			rs.next();
 			mitjanes.add(new MitjRestaurant(i,rs.getDouble("rowcount")));
-			System.out.println(i+"de 100");
 		}
 		return mitjanes;
 	}
@@ -243,7 +239,7 @@ public class Estudi {
 	 * @return llistat de mitjanes i usuaris
 	 * @throws Exception SQL EXCEPTION
 	 */
-	public List<RelUsrPunt> mitjanaPuntuacioCadaUsuari() throws Exception{
+	public List<RelUsrPunt> mitjanaPuntuacioCadaUsuari() throws Exception{ 
 		List<RelUsrPunt> mitjanesUsuaris = new ArrayList<RelUsrPunt>();
 		ResultSet rs;
 		String sql;
@@ -253,7 +249,6 @@ public class Estudi {
 			rs.next();
 			mitjanesUsuaris.add(new RelUsrPunt(i,rs.getDouble("visitats")));
 		}
-		Collections.sort(mitjanesUsuaris);
 		return mitjanesUsuaris;
 	}
 	
@@ -339,7 +334,7 @@ public class Estudi {
 		List<DesviacioEstMostralRestaurant> desviacioS = new ArrayList<DesviacioEstMostralRestaurant>();
 		
 		for(int i = 1; i<=50; i++) {
-			sql = "SELECT puntuacio FROM relusrrest WHERE (restaurant ="+i+"AND puntuacio!= 99.00 )";
+			sql = "SELECT puntuacio FROM relusrrest WHERE ( restaurant ="+i+" AND puntuacio!=99.00 )";
 			rs = statement.executeQuery(sql);
 			while(rs.next()) {
 				valors.add(rs.getDouble("puntuacio"));
@@ -458,108 +453,136 @@ public class Estudi {
 	 */
 	public List<Histograma> histogramaXintervalsRestaurants() throws Exception{
 		List<Histograma> resultat = new ArrayList<Histograma>();
+		List<Double> auxiliar = new ArrayList<Double>();
 		String sql;
 		ResultSet rs;
 		
-		sql="SELECT count(puntuacio) AS interval"
-		 + " FROM relusrrest"
-		 + " WHERE (puntuacio!=99.00 AND"
-		 		+ " puntuacio>=-10 AND puntuacio<=-8"
-		 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		sql="SELECT puntuacio"
+		 + " FROM relusrrest WHERE (puntuacio>=-10.00 AND puntuacio<=-8.00"
+		 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 		
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval[-10, -8]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval[-10, -8]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>-8 AND puntuacio<=-6"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>-8.00 AND puntuacio<=-6.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(-8, -6]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(-8, -6]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>-6 AND puntuacio<=-4"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>-6.00 AND puntuacio<=-4.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(-6, -4]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(-6, -4]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>-4 AND puntuacio<=-2"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>-4.00 AND puntuacio<=-2.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(-4, -2]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(-4, -2]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>-2 AND puntuacio<=0"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>-2.00 AND puntuacio<=0.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(-2, 0]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(-2, 0]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>0 AND puntuacio<=2"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>0.00 AND puntuacio<=2.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(0, 2]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(0, 2]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>2 AND puntuacio<=4"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>2.00 AND puntuacio<=4.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(2, 4]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(2, 4]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>4 AND puntuacio<=6"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>4.00 AND puntuacio<=6.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(4, 6]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(4, 6]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>6 AND puntuacio<=8"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>6.00 AND puntuacio<=8.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(6, 8]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(6, 8]",auxiliar.size()));
+		auxiliar = new ArrayList<Double>();
 		
-		sql="SELECT count(puntuacio) AS interval"
-				 + " FROM relusrrest"
-				 + " WHERE (puntuacio!=99.00 AND"
-				 		+ " puntuacio>8 AND puntuacio<=10"
-				 		+ " AND puntuacio IN (SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio !=99.00))";
+		
+		
+		sql="SELECT puntuacio"
+				 + " FROM relusrrest WHERE (puntuacio>8.00 AND puntuacio<=10.00"
+				 + " AND puntuacio IN(SELECT DISTINCT puntuacio FROM relusrrest WHERE puntuacio!=99.00))";
 				
 		rs = statement.executeQuery(sql);
-		rs.next();
-		resultat.add(new Histograma("Interval(8, 10]",rs.getInt("interval")));
+		while(rs.next()) {
+			auxiliar.add(rs.getDouble("puntuacio"));
+		}
+		resultat.add(new Histograma("Interval(8, 10]",auxiliar.size()));
 		
 		return resultat;
 	}
@@ -600,7 +623,7 @@ public class Estudi {
 		rs = statement.executeQuery(sql);
 		rs.next();
 		int casosPossibles = rs.getInt("casosPossibles");
-		
+		double casosPoss = Double.valueOf(casosPossibles);
 		for(Double d : puntuacions) {
 			sql = "SELECT count(*) AS casosFavorables"
 			   + " FROM relusrrest"
@@ -608,7 +631,8 @@ public class Estudi {
 			rs = statement.executeQuery(sql);
 			rs.next();
 			int casosFavorables = rs.getInt("casosFavorables");
-			probabilitats.add(new Probabilitat("Probabilitat de que surti un "+d, casosFavorables/casosPossibles));
+			double casosFav = Double.valueOf(casosFavorables);
+			probabilitats.add(new Probabilitat(String.valueOf(d), casosFav/casosPoss));
 		}
 		
 		return probabilitats;
@@ -696,16 +720,10 @@ public class Estudi {
 		ResultSet rs;
 		String sql;
 		for(int i=1; i<=NUMUSUARIS; i++) {
-			sql="SELECT count(*) AS visitats FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
+			sql="SELECT AVG(puntuacio) AS mitjana FROM relusrrest WHERE(usuari="+i+" AND puntuacio!=99.00)";
 			rs = statement.executeQuery(sql);
 			rs.next();
-			int compt=rs.getInt("visitats");
-			float comptF=Float.valueOf(compt);
-			sql="SELECT SUM(puntuacio) AS suma FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
-			rs = statement.executeQuery(sql);
-			rs.next();
-			float sum=rs.getFloat("suma");
-			mitjanesUsuaris.add(new RelUsrPunt(i,sum/comptF));
+			mitjanesUsuaris.add(new RelUsrPunt(i,rs.getDouble("mitjana")));
 		}
 		
 		Collections.sort(mitjanesUsuaris);
@@ -724,16 +742,10 @@ public class Estudi {
 		ResultSet rs;
 		String sql;
 		for(int i = 1; i<=NUMUSUARIS; i++) {
-			sql="SELECT count(*) AS visitats FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
+			sql="SELECT AVG(puntuacio) AS mitjana FROM relusrrest WHERE(usuari="+i+" AND puntuacio!=99.00)";
 			rs = statement.executeQuery(sql);
 			rs.next();
-			int compt=rs.getInt("visitats");
-			float comptF=Float.valueOf(compt);
-			sql="SELECT SUM(puntuacio) AS suma FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
-			rs = statement.executeQuery(sql);
-			rs.next();
-			float sum=rs.getFloat("suma");
-			mitjanesPuntsXUsr.add(new RelUsrPunt(i,sum/comptF));
+			mitjanesPuntsXUsr.add(new RelUsrPunt(i,rs.getDouble("mitjana")));
 		}
 		
 		Collections.sort(mitjanesPuntsXUsr);
@@ -748,13 +760,13 @@ public class Estudi {
 	 * @throws Exception SQL EXCEPTION
 	 */
 	public float puntuacioMesAlta() throws Exception{
-		String sql="SELECT MAX(puntuacio) AS maxValue"
+		String sql="SELECT MAX(puntuacio) AS max"
 				+ " FROM relusrrest"
 				+ " WHERE (puntuacio!=99.00)";
 		ResultSet rs;
 		rs = statement.executeQuery(sql);
 		rs.next();
-		return rs.getFloat("maxValue");
+		return rs.getFloat("max");
 		
 	}
 	
@@ -764,13 +776,13 @@ public class Estudi {
 	 * @throws Exception SQL EXCEPTION
 	 */ 
 	public float puntuacioMesBaixa() throws Exception{
-		String sql="SELECT MIN(puntuacio) AS minValue"
+		String sql="SELECT MIN(puntuacio) AS min"
 				+ " FROM relusrrest"
 				+ " WHERE (puntuacio!=99.00)";
 		ResultSet rs;
 		rs = statement.executeQuery(sql);
 		rs.next();
-		return rs.getFloat("minValue");
+		return rs.getFloat("min");
 	}
 
 }

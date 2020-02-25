@@ -4,8 +4,6 @@ import java.io.*;
 import java.sql.*;
 import Estudi.*;
 import java.util.*;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
  
 
@@ -13,6 +11,10 @@ public class ConnexioDB {
 	
 	private static Scanner teclat = new Scanner(System.in);
 	
+	/**
+	 * Mètode que permet la connexió amb la base de dades Mysql
+	 * @return connexió
+	 */
 	private static Connection connexioDB() {
 		System.out.println("Establint la connexió amb la base de dades...");
 		try {
@@ -27,7 +29,12 @@ public class ConnexioDB {
 		
 	}
 	
-	
+	/**
+	 * Mètode que crea les taules a la base de dades SQL relacional. 
+	 * @param sentenciaSQL Comunicació per a generar les taules
+	 * @param conn Connexió establerta
+	 * @throws Exception SQL EXCEPTION
+	 */
 	private static void crearTaules(Statement sentenciaSQL, Connection conn) throws Exception {
 		sentenciaSQL = conn.createStatement();
 		String taulaUsuari = "CREATE TABLE USUARI "
@@ -63,8 +70,11 @@ public class ConnexioDB {
 		
 	}
 	
-	
-	
+	/**
+	 * Mètode del programa principal que permet una certa connexió amb l'usuari i si l'usuari vol, crea les taules.
+	 * @param stmt Comunicació que permet la creació de les taules.
+	 * @param connexio Connexió amb la base de dades
+	 */
 	private static void creacioTaules(Statement stmt, Connection connexio) {
 		System.out.println("Vols crear taules [S/n]?");
 		String op = teclat.nextLine();
@@ -85,8 +95,11 @@ public class ConnexioDB {
 		}
 	}
 	
-	
-	
+	/**
+	 * Mètode del programa principal que permet un cert grau d'interactuament amb l'usuari i que permet guardar les dades a la base de dades.
+	 * @param nomF Nom del fitxer a llegir.
+	 * @param c Connexió establerta amb la base de dades
+	 */
 	private static void guardarDadesADB(String nomF, Connection c){
 		System.out.println("Vols emmagatzemar les dades?[S/n]");
 		String op = teclat.nextLine();
@@ -139,6 +152,10 @@ public class ConnexioDB {
 		
 	}
 	
+	/**
+	 * Mètode que escriu el fitxer amb tots els identificadors dels restaurants.
+	 * @throws IOException En cas que hi hagi algun error en la comunicació Entrada/Sortida
+	 */
 	private static void fitxerRestaurants() throws IOException{
 		BufferedWriter bOut = new BufferedWriter(new FileWriter("restaurants.txt"));
 		
@@ -150,6 +167,10 @@ public class ConnexioDB {
 		bOut.close();
 	}
 	
+	/**
+	 * Mètode que escriu el fitxer amb tots els identificadors dels usuaris
+	 * @throws IOException En cas que hi hagi algun problema en la comunicació Entrada/Sortida
+	 */
 	private static void fitxerUsuaris() throws IOException{
 		BufferedWriter bOut = new BufferedWriter(new FileWriter("usuaris.txt"));
 		
@@ -160,8 +181,11 @@ public class ConnexioDB {
 		bOut.close();
 	}
 	
-	
-	
+	/**
+	 * Mètode que permet processar les dades de la relació del fitxer i crea el fitxer amb les dades.
+	 * @param nomFitxer Fitxer a llegir
+	 * @throws IOException En cas que hi hagi algun problema en la Entrada/Sortida amb els fitxers.
+	 */
 	private static void processarFitxerIGenerarFitxerRelacio(String nomFitxer) throws IOException{
 		BufferedReader bIn = new BufferedReader(new FileReader(nomFitxer));
 		BufferedWriter bOut = new BufferedWriter(new FileWriter("relacio.txt"));
@@ -198,22 +222,213 @@ public class ConnexioDB {
 		bOut.close();
 	}
 	
-	
-	private static void mitjanesCadaRestaurant(Estudi e) throws Exception{
-		List<Double> mitjanes = e.mitjanaPuntuacioCadaRestaurant();
-		System.out.println("RESTAURANT\t\tPUNTUACIO");
-		int i=1;
-		
-		for(Double d:mitjanes) {
-			System.out.println(i+"\t\t"+d);
-			i++;
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: numeroDeVisitesXRestaurant
+	 * @param resultat llistat solucio
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_numeroDeVisitesXRestaurant(List<InfluenciaGent> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("influenciaGent.txt"));
+		b.write("idRestaurant,vegadesVisitat");
+		b.newLine();
+		for(InfluenciaGent i :resultat) {
+			b.write(String.valueOf(i.getIdRestaurant())+","+String.valueOf(i.getNumPuntuacions()));
+			b.newLine();
 		}
-		
+		b.close();
+		System.out.println("Fitxer influenciaGent.txt creat amb la informació requerida.");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: numeroDeRestaurantsVisitats
+	 * @param resultat llistat solucio
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_numeroDeRestaurantsVisitats(List<RestVisitats> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("restaurantsVisitats.txt"));
+		b.write("idUsuari, restaurantsVisitats");
+		b.newLine();
+		for(RestVisitats i : resultat) {
+			b.write(String.valueOf(i.getIdUsuari())+","+String.valueOf(i.getNumRestaurants()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("Fitxer restaurantsVisitatsPerUsuari.txt creat amb la informació requerida.");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: mitjanaPuntuacioCadaRestaurant
+	 * @param resultat llista solucio
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_mitjanaPuntuacioCadaRestaurant(List<MitjRestaurant> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("mitjanaRestaurants.txt"));
+		b.write("idRestaurant, mitjana");
+		b.newLine();
+		for(MitjRestaurant m : resultat) {
+			b.write(String.valueOf(m.getIdRestaurant())+","+String.valueOf(m.getMitjana()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("Fitxer mitjanaRestaurants.txt creat amb la informació requerida");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: mitjanaPuntuacioCadaUsuari
+	 * @param resultat llistat solució
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_mitjanaPuntuacioCadaUsuari(List<RelUsrPunt> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("mitjanaUsuaris.txt"));
+		b.write("idUsuari, mitjana");
+		b.newLine();
+		for(RelUsrPunt r : resultat) {
+			b.write(String.valueOf(r.getIdUsuari())+","+String.valueOf(r.getPuntuacio()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("Fitxer mitjanaUsuaris.txt s'ha creat correctament amb les dades requerides.");
 		
 	}
 	
-		
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: desviacioAbsolutaPuntuacioRestaurants
+	 * @param resultat llistat solució
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_desviacioAbsolutaPuntuacioRestaurants(List<DesviacioAbsRestaurant> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("desviacionsAbsolutesPerRestaurant.txt"));
+		b.write("idRestaurant, deviacioAbsoluta");
+		b.newLine();
+		for(DesviacioAbsRestaurant desv : resultat) {
+			b.write(String.valueOf(desv.getIdRestaurant())+","+String.valueOf(desv.getDesviacioAbsMitjana()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("Fitxer desviacionsAbsolutesPerRestaurant.txt creat correctament.");
+	}
 	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: desviacioEstandardMostralPerRestaurants
+	 * @param resultat llistat solucio
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_desviacioEstandardMostralPerRestaurants(List<DesviacioEstMostralRestaurant> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("desviacionsEstandardsMostralsPerRestaurant.txt"));
+		b.write("idRestaurant, desviacioEstMostral");
+		b.newLine();
+		for(DesviacioEstMostralRestaurant desvestm:resultat) {
+			b.write(String.valueOf(desvestm.getIdRestaurant())+","+String.valueOf(desvestm.getDesviacioEstandardMostral()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("El fitxer desviacionsEstandardsMostralsPerRestaunrant.txt creat correctament.");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: desviacioEstandardPoblacionalPerRestaurants
+	 * @param resultat llistat solucio
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_desviacioEstandardPoblacionalPerRestaurants(List<DesviacioEstandardPoblacionalPerRestaurant> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("desviacionsEstandardsPoblacionalsPerRestaurant.txt"));
+		b.write("idRestaurant, desviacioEstPoblacional");
+		b.newLine();
+		for(DesviacioEstandardPoblacionalPerRestaurant desvestp : resultat) {
+			b.write(String.valueOf(desvestp.getIdRestaurant())+","+String.valueOf(desvestp.getDesvEstPob()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("El fitxer desviacionsEstandardsPoblacionalsPerRestaurant.txt s'ha creat correctament.");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: desviacioMitjanaPerRestaurants
+	 * @param resultat llistat solució
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_desviacioMitjanaPerRestaurants(List<DesvMitjanaRestaurant> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("desviacionsMitjanesPerRestaurant.txt"));
+		b.write("idRestaurant, desviacioMitjRestaurant");
+		b.newLine();
+		for(DesvMitjanaRestaurant desvestmitj : resultat) {
+			b.write(String.valueOf(desvestmitj.getIdRestaurant())+","+desvestmitj.getDesvMitjana());
+			b.newLine();
+		}
+		b.close();
+		
+		System.out.println("El fitxer desviacionsMitjanesPerRestaurant.txt s'ha creat correctament.");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: histogramaXintervalsRestaurants
+	 * @param resultat llistat solució
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_histogramaXintervalsRestaurants(List<Histograma> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("histograma.txt"));
+		b.write("interval,comptador");
+		b.newLine();
+		for(Histograma h : resultat) {
+			b.write(h.getInterval()+","+String.valueOf(h.getNumVegades()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("El fitxer histograma.txt s'ha creat correctament. ");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: probabilitatDeCadaPuntuacio
+	 * @param resultat llistat solució
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_probabilitatDeCadaPuntuacio(List<Probabilitat> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("probabilitats.txt"));
+		b.write("nota, probabilitat");
+		b.newLine();
+		for(Probabilitat p : resultat) {
+			b.write(p.getProbNum()+","+String.valueOf(p.getProbabilitat()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("El fitxer de probabilitats.txt s'ha creat correctament.");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: relacioUsuariPuntuacio10Restaurant
+	 * @param resultat llistat solució
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_relacioUsuariPuntuacio10Restaurant(List<RelUsrRest> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("usuarisQueHanVotat10.txt"));
+		b.write("idUsuari, idRestaurant");
+		b.newLine();
+		for(RelUsrRest r : resultat) {
+			b.write(String.valueOf(r.getIdUsuari())+","+String.valueOf(r.getIdRestaurant()));
+			b.newLine();
+		}
+		b.close();
+		
+		System.out.println("El fitxer usuarisQueHanVotat10.txt s'ha creat correctament.");
+	}
+	
+	/**
+	 * Mètode que permet escriure el resultat de la execució del estudi: relacioUsuariPuntuacioMesBaixaRestaurant
+	 * @param resultat llistat solució
+	 * @throws Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_relacioUsuariPuntuacioMesBaixaRestaurant(List<RelUsrRest> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("usuarisQueHanVotatMesBaix.txt"));
+		b.write("idUsuari, idRestaurant");
+		b.newLine();
+		for(RelUsrRest r : resultat) {
+			b.write(String.valueOf(r.getIdUsuari())+","+String.valueOf(r.getIdRestaurant()));
+			b.newLine();
+		}
+		b.close();
+		
+		System.out.println("El fitxer usuarisQueHanVotatMesBaix.txt s'ha creat correctament.");
+	}
 	
 	public static void main (String[] args) {
 		
@@ -239,45 +454,62 @@ public class ConnexioDB {
 			stmt = connexio.createStatement();
 			Estudi estudi = new Estudi(stmt);
 			
-			//System.out.println("Nombre de restaurants: "+estudi.comptarRestaurants()+" restaurants."); //100
+			System.out.println("Nombre de restaurants: "+estudi.comptarRestaurants()+" restaurants."); //100
 			
-			//System.out.println("Nombre d'usuaris: "+estudi.comptarUsuaris()+" usuaris.");//73421
+			System.out.println("Nombre d'usuaris: "+estudi.comptarUsuaris()+" usuaris.");//73421
 			
-			//System.out.println("Nombre de puntuacions buides(99.00): "+estudi.comptarNoVotats()+" restaurants no votats.");//3245740
+			System.out.println("Nombre de puntuacions buides(99.00): "+estudi.comptarNoVotats()+" restaurants no votats.");//3245740
 			
-			//System.out.println("Nombre de puntuacions no buides: "+estudi.comptarVotats()+" restaurants votats.");//4096360
+			System.out.println("Nombre de puntuacions no buides: "+estudi.comptarVotats()+" restaurants votats.");//4096360
 			
-			//System.out.println("Nombre de vots negatius [-10,-0.01]: "+estudi.comptarVotsNegatius()+" vots negatius.");//16889608
+			System.out.println("Nombre de vots negatius [-10,-0.01]: "+estudi.comptarVotsNegatius()+" vots negatius.");//16889608
 			
-			//System.out.println("Nombre de vots neutres (0.00): "+estudi.comptarVotsZero()+" vots zero."); //12482
+			System.out.println("Nombre de vots neutres (0.00): "+estudi.comptarVotsZero()+" vots zero."); //12482
 			
-			//System.out.println("Nombre de vots positius (0,10]: "+estudi.comptarVotsPositius()+" vots positius."); //2394970
+			System.out.println("Nombre de vots positius (0,10]: "+estudi.comptarVotsPositius()+" vots positius."); //2394970
 			
-			//System.out.println("Puntuació mitjana que els usuaris de la mostra han donat (sumaTotalPuntuacions/totalPuntuacions):"+estudi.mitjanaTotesPuntuacions()+" de mitjana."); //0.7418716250524856
+			System.out.println(estudi.usuariAmbMesRestaurantsVisitats()+" usuari amb mes restaurants visitats."); //L'usuari 9 ha visitat: 100 vegades.
 			
-			//mitjanesCadaRestaurant(estudi);
+			System.out.println(estudi.usuariQueVotaPitjor()+" usuari que ha avaluat pitjor."); //34628 usuari que ha avaluat pitjor.
 			
-			//System.out.println(estudi.relacioUsuariPuntuacio10Restaurant());
+			System.out.println(estudi.percentatgeRestaurantsAprobats()); //70%
 			
-			//System.out.println(estudi.relacioUsuariPuntuacioMesBaixaRestaurant());
+			System.out.println(estudi.percentatgeRestaurantsSuspesos()); //30%
 			
-			//System.out.println(estudi.usuariAmbMesRestaurantsVisitats());
+			System.out.println(estudi.mitjanaTotesPuntuacions()+" de mitjana de totes les puntuacions."); // 0.741872
 			
-			//System.out.println(estudi.usuariQueVotaMillor());
+			System.out.println(estudi.usuariQueVotaMillor()+" usuari que ha votat millor."); //36945 usuari que ha votat millor.
 			
-			//System.out.println(estudi.probabilitatDeCadaPuntuacio());
+			System.out.println(estudi.puntuacioMesAlta()+" puntuacio mes alta de totes. "); //10 mes alta
 			
+			System.out.println(estudi.puntuacioMesBaixa()+" puntuacio mes baixa de totes ."); // -9.95 mes baixa
 			
+			escriureResultat_mitjanaPuntuacioCadaRestaurant(estudi.mitjanaPuntuacioCadaRestaurant());
+			
+			escriureResultat_desviacioAbsolutaPuntuacioRestaurants(estudi.desviacioAbsolutaPuntuacioRestaurants());
+			
+			escriureResultat_desviacioEstandardMostralPerRestaurants(estudi.desviacioEstandardMostralPerRestaurants());
+			
+			escriureResultat_desviacioEstandardPoblacionalPerRestaurants(estudi.desviacioEstandardPoblacionalPerRestaurants());
+			
+			escriureResultat_desviacioMitjanaPerRestaurants(estudi.desviacioMitjanaPerRestaurants());
+			
+			escriureResultat_histogramaXintervalsRestaurants(estudi.histogramaXintervalsRestaurants());
+			
+			escriureResultat_numeroDeVisitesXRestaurant(estudi.numeroDeVisitesXRestaurant());
+			
+			escriureResultat_numeroDeRestaurantsVisitats(estudi.numeroDeRestaurantsVisitats());
+			
+			escriureResultat_mitjanaPuntuacioCadaUsuari(estudi.mitjanaPuntuacioCadaUsuari());
+			
+			escriureResultat_probabilitatDeCadaPuntuacio(estudi.probabilitatDeCadaPuntuacio());
+			
+			escriureResultat_relacioUsuariPuntuacio10Restaurant(estudi.relacioUsuariPuntuacio10Restaurant());
+			
+			escriureResultat_relacioUsuariPuntuacioMesBaixaRestaurant(estudi.relacioUsuariPuntuacioMesBaixaRestaurant());
 		}catch(Exception e) {
 			System.out.println(e);
 		}
-		
-		
-		
-		
-		
-		
-		
 	}
 
 }
