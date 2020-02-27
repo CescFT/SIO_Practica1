@@ -430,6 +430,63 @@ public class ConnexioDB {
 		System.out.println("El fitxer usuarisQueHanVotatMesBaix.txt s'ha creat correctament.");
 	}
 	
+	/**
+	 * Mètode que permet la escriptura de totes les puntuacions dels restaurants
+	 * @param resultat llista solució
+	 * @throws Exception Exception Error Entrada/Sortida
+	 */
+	private static void escriureResultat_totesPuntuacions(List<relRestPuntuacio> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("puntuacionsXRestaurant.txt"));
+		b.write("puntuacions");
+		b.newLine();
+		for(relRestPuntuacio r : resultat) {
+			b.write(String.valueOf(r.getIdRestaurant())+","+r.puntuacions());
+			b.newLine();
+		}
+		b.close();
+		
+		System.out.println("El fitxer puntuacionsXRestaurant.txt s'ha creat correctament.");
+	}
+	
+	
+	private static void escriureResultat_totesPuntuacionsXUsuari(List<relUsuariPuntuacio> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("puntuacionsXUsuari.txt"));
+		b.write("Puntuacions Usuari");
+		b.newLine();
+		for(relUsuariPuntuacio r : resultat) {
+			b.write(String.valueOf(r.getIdUsuari())+","+r.puntuacions());
+			b.newLine();
+		}
+		b.close();
+		System.out.println("El fitxer puntuacionsXUsuari.txt s'ha creat correctament.");
+	}
+	
+	private static void escriureResultat_desviacioEstandardPoblacionalPerUsuari(List<DesviacioEstandardPoblacionalPerUsuari> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("desviacioEstandardPoblacionalPerUsuari.txt"));
+		b.write("idUsuari, desviacioEstandardPoblacional");
+		
+		for(DesviacioEstandardPoblacionalPerUsuari r: resultat) {
+			b.write(String.valueOf(r.getIdUsuari())+","+String.valueOf(r.getDesvestp()));
+			b.newLine();
+		}
+		
+		b.close();
+		System.out.println("El fitxer desviacioEstandardPoblacionalPerUsuari.txt s'ha creat correctament.");
+	}
+	
+	
+	private static void escriureResultat_desviacioEstandardMostralPerUsuari(List<DesviacioEstMostralUsuari> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("desviacioEstandardMostralPerUsuari.txt"));
+		b.write("idUsuari, desviacioEstMostral");
+		b.newLine();
+		for(DesviacioEstMostralUsuari r : resultat) {
+			b.write(String.valueOf(r.getIdUsuari())+","+String.valueOf(r.getDesvestm()));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("El fitxer desviacioEstandardMostralPerUsuari.txt s'ha creat correctament.");
+	}
+	
 	public static void main (String[] args) {
 		
 		Connection connexio=null;
@@ -454,7 +511,7 @@ public class ConnexioDB {
 			stmt = connexio.createStatement();
 			Estudi estudi = new Estudi(stmt);
 			
-			System.out.println("Nombre de restaurants: "+estudi.comptarRestaurants()+" restaurants."); //100
+			/*System.out.println("Nombre de restaurants: "+estudi.comptarRestaurants()+" restaurants."); //100
 			
 			System.out.println("Nombre d'usuaris: "+estudi.comptarUsuaris()+" usuaris.");//73421
 			
@@ -507,6 +564,18 @@ public class ConnexioDB {
 			escriureResultat_relacioUsuariPuntuacio10Restaurant(estudi.relacioUsuariPuntuacio10Restaurant());
 			
 			escriureResultat_relacioUsuariPuntuacioMesBaixaRestaurant(estudi.relacioUsuariPuntuacioMesBaixaRestaurant());
+			
+			escriureResultat_totesPuntuacions(estudi.totesPuntuacionsXRestaurants());
+			
+			escriureResultat_totesPuntuacionsXUsuari(estudi.totesPuntuacionsXUsuari());
+			
+			escriureResultat_desviacioEstandardPoblacionalPerUsuari(estudi.desviacioEstandardPoblacionalPerUsuari());
+			*/
+			
+			escriureResultat_desviacioEstandardMostralPerUsuari(estudi.desviacioEstandardMostralPerUsuari());
+			
+			
+			
 		}catch(Exception e) {
 			System.out.println(e);
 		}

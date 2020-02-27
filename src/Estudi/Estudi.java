@@ -361,6 +361,44 @@ public class Estudi {
 	}
 	
 	/**
+	 * Mètode que calcula la desviació estandard mostral per usuari
+	 * @return llistat de desviacions
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<DesviacioEstMostralUsuari> desviacioEstandardMostralPerUsuari() throws Exception{
+		String sql;
+		ResultSet rs;
+		List<Double> valors = new ArrayList<Double>();
+		List<DesviacioEstMostralUsuari> desviacioS = new ArrayList<DesviacioEstMostralUsuari>();
+		
+		for(int i=1; i<=36711; i++) {
+			sql ="SELECT puntuacio FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
+			rs=statement.executeQuery(sql);
+			while(rs.next()) {
+				valors.add(rs.getDouble("puntuacio"));
+			}
+			
+			sql ="SELECT AVG(puntuacio) AS mitjana FROM relusrrest WHERE (usuari="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			rs.next();
+			double mitjana = rs.getDouble("mitjana");
+			
+			double v=0;
+			for(Double d:valors) {
+				double base = d-mitjana;
+				v+=Math.pow(base, 2);
+			}
+			double numElems = Double.valueOf(valors.size());
+			double numElemsXLaFormula = numElems -1;
+			double a = 1/numElemsXLaFormula;
+			desviacioS.add(new DesviacioEstMostralUsuari(i, Math.sqrt(a*v)));
+			System.out.println(i+" de 100");
+		}
+		
+		return desviacioS;
+	}
+	
+	/**
 	 * Mètode que calcula la desviació estandard poblacional de les puntuacions dels 100 restaurants.
 	 * La desviació estàndard poblacional es determina calculant l'arrel quadrada de la mitjana de les desviacions dels valors restats del seu valor mitjà, elevat al quadrat.
 	 * FONT: https://es.wikipedia.org/wiki/Desviaci%C3%B3n_t%C3%ADpica#Desviaci%C3%B3n_est%C3%A1ndar_poblacional_de_las_calificaciones_de_ocho_alumnos
@@ -400,6 +438,45 @@ public class Estudi {
 		
 		return resultat;
 	}
+	
+	/**
+	 * Desviació estàndard poblacional per usuari
+	 * @return llistat amb la desviació de cadascun
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<DesviacioEstandardPoblacionalPerUsuari> desviacioEstandardPoblacionalPerUsuari() throws Exception{
+		List<DesviacioEstandardPoblacionalPerUsuari> resultat = new ArrayList<DesviacioEstandardPoblacionalPerUsuari>();
+		String sql;
+		ResultSet rs;
+		
+		List<Double> valors = new ArrayList<Double>();
+		
+		for(int i = 1; i<=NUMUSUARIS; i++) {
+			sql = "SELECT puntuacio FROM relusrrest WHERE(usuari="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			while(rs.next()) {
+				valors.add(rs.getDouble("puntuacio"));
+			}
+			sql = "SELECT AVG(puntuacio) AS mitjana FROM relusrrest WHERE(usuari="+i+" AND puntuacio!=99.00)";
+			rs = statement.executeQuery(sql);
+			rs.next();
+			double mitjana = rs.getDouble("mitjana");
+			double numElems = Double.valueOf(valors.size());
+			double v = 0;
+			double base;
+			for(Double d : valors) {
+				base = d-mitjana;
+				v+=Math.pow(base, 2);
+			}
+			
+			double res = v/numElems;
+			resultat.add(new DesviacioEstandardPoblacionalPerUsuari(i, Math.sqrt(res)));
+			System.out.println(i+" de 73421");
+		}
+		
+		return resultat;
+	}
+	
 	
 	/**
 	 * Mètode que permet el càlcul de la desviació mitjana per restaurants. En estadística la desviació absoluta mitjana és la mitjana de les desviacions absolutes --> dispersió.
@@ -783,6 +860,51 @@ public class Estudi {
 		rs = statement.executeQuery(sql);
 		rs.next();
 		return rs.getFloat("min");
+	}
+	
+	/**
+	 * Mètode que retorna totes les puntuacions x restaurants
+	 * @return totes les puntuacions
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<relRestPuntuacio> totesPuntuacionsXRestaurants() throws Exception{
+		List<relRestPuntuacio> resultat = new ArrayList<relRestPuntuacio>();
+		List<Double> resParcial = new ArrayList<Double>();
+		String sql;
+		ResultSet rs;
+		for(int i=1; i<=NUMRESTAURANTS;i++) {
+			sql="SELECT puntuacio FROM relusrrest WHERE (puntuacio!= 99.00 AND restaurant="+i+")";
+			rs = statement.executeQuery(sql);
+			while(rs.next()) {
+				resParcial.add(rs.getDouble("puntuacio"));
+			}
+			resultat.add(new relRestPuntuacio(i, resParcial));
+			resParcial = new ArrayList<Double>();
+		}
+		return resultat;
+	}
+	
+	/**
+	 * Mètode que retorna totes les puntuacuons x usuaris
+	 * @return totes les puntuacions
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<relUsuariPuntuacio> totesPuntuacionsXUsuari() throws Exception{
+		List<relUsuariPuntuacio> resultat = new ArrayList<relUsuariPuntuacio>();
+		List<Double> resParcial = new ArrayList<Double>();
+		String sql;
+		ResultSet rs;
+		for(int i=1; i<=NUMUSUARIS; i++) {
+			sql = "SELECT puntuacio FROM relusrrest WHERE (puntuacio!= 99.00 AND usuari="+i+")";
+			rs = statement.executeQuery(sql);
+			while(rs.next()) {
+				resParcial.add(rs.getDouble("puntuacio"));
+			}
+			resultat.add(new relUsuariPuntuacio(i, resParcial));
+			resParcial = new ArrayList<Double>();
+			System.out.println(i+" de 73421");
+		}
+		return resultat;
 	}
 
 }
