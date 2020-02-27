@@ -511,7 +511,7 @@ public class ConnexioDB {
 			stmt = connexio.createStatement();
 			Estudi estudi = new Estudi(stmt);
 			
-			/*System.out.println("Nombre de restaurants: "+estudi.comptarRestaurants()+" restaurants."); //100
+			System.out.println("Nombre de restaurants: "+estudi.comptarRestaurants()+" restaurants."); //100
 			
 			System.out.println("Nombre d'usuaris: "+estudi.comptarUsuaris()+" usuaris.");//73421
 			
@@ -570,7 +570,7 @@ public class ConnexioDB {
 			escriureResultat_totesPuntuacionsXUsuari(estudi.totesPuntuacionsXUsuari());
 			
 			escriureResultat_desviacioEstandardPoblacionalPerUsuari(estudi.desviacioEstandardPoblacionalPerUsuari());
-			*/
+			
 			
 			escriureResultat_desviacioEstandardMostralPerUsuari(estudi.desviacioEstandardMostralPerUsuari());
 			
