@@ -440,6 +440,53 @@ public class Estudi {
 	}
 	
 	/**
+	 * Desviacio estandard poblacional de totes les puntuacions
+	 * @return desviacio p
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public double desviacioEstandardPoblacionalTotal() throws Exception{
+		double mitjana = this.mitjanaTotesPuntuacions();
+		List<Double> valors = new ArrayList<Double>();
+		String sql;
+		ResultSet rs;
+		sql = "SELECT puntuacio FROM relusrrest WHERE puntuacio!=99.00";
+		rs = statement.executeQuery(sql);
+		while(rs.next()) {
+			valors.add(rs.getDouble("puntuacio"));
+		}
+		double numElems = Double.valueOf(valors.size());
+		double sumatori = 0;
+		double base;
+		for(Double d : valors) {
+			base = d - mitjana;
+			sumatori+=Math.pow(base, 2);
+		}
+		double res = sumatori/numElems;
+		return Math.sqrt(res);
+	}
+	
+	/**
+	 * llistat de totes les puntuacions
+	 * @return llistat de totes
+	 * @throws Exception SQL EXCEPTION
+	 */
+	public List<Double> totesPuntuacions() throws Exception{
+		String sql;
+		ResultSet rs;
+		List<Double> res = new ArrayList<Double>();
+		sql="SELECT puntuacio FROM relusrrest WHERE puntuacio!=99.00";
+		rs = statement.executeQuery(sql);
+		int cmpt =1;
+		while(rs.next()) {
+			res.add(rs.getDouble("puntuacio"));
+			System.out.println(cmpt+" de fet.");
+			cmpt++;
+		}
+		
+		return res;
+	}
+	
+	/**
 	 * Desviació estàndard poblacional per usuari
 	 * @return llistat amb la desviació de cadascun
 	 * @throws Exception SQL EXCEPTION

@@ -13,3 +13,4 @@ mitjana de totes les puntuacions: 0.741872
 usuari que ha votat millor: 36945
 puntuacio mes alta de totes: 10.00
 puntuacio mes baixa de totes:-9.95
+desviació estàndard poblacional de totes les puntuacions: 5.295298872927734

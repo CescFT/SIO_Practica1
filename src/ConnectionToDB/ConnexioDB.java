@@ -448,7 +448,11 @@ public class ConnexioDB {
 		System.out.println("El fitxer puntuacionsXRestaurant.txt s'ha creat correctament.");
 	}
 	
-	
+	/**
+	 * Mètode que permet escriure totes les puntuacions en vista dels usuaris
+	 * @param resultat llistat solucio
+	 * @throws Exception Exception Error Entrada/Sortida
+	 */
 	private static void escriureResultat_totesPuntuacionsXUsuari(List<relUsuariPuntuacio> resultat) throws Exception{
 		BufferedWriter b = new BufferedWriter(new FileWriter("puntuacionsXUsuari.txt"));
 		b.write("Puntuacions Usuari");
@@ -461,6 +465,11 @@ public class ConnexioDB {
 		System.out.println("El fitxer puntuacionsXUsuari.txt s'ha creat correctament.");
 	}
 	
+	/**
+	 * Mètode que permet escriure la desvestp per usuari
+	 * @param resultat llistat solucio
+	 * @throws Exception Exception Error Entrada/Sortida
+	 */
 	private static void escriureResultat_desviacioEstandardPoblacionalPerUsuari(List<DesviacioEstandardPoblacionalPerUsuari> resultat) throws Exception{
 		BufferedWriter b = new BufferedWriter(new FileWriter("desviacioEstandardPoblacionalPerUsuari.txt"));
 		b.write("idUsuari, desviacioEstandardPoblacional");
@@ -474,7 +483,11 @@ public class ConnexioDB {
 		System.out.println("El fitxer desviacioEstandardPoblacionalPerUsuari.txt s'ha creat correctament.");
 	}
 	
-	
+	/**
+	 * Mètode que permet escriure la desvestm per usuari
+	 * @param resultat llistat solució
+	 * @throws Exception Error entrada/srotida
+	 */
 	private static void escriureResultat_desviacioEstandardMostralPerUsuari(List<DesviacioEstMostralUsuari> resultat) throws Exception{
 		BufferedWriter b = new BufferedWriter(new FileWriter("desviacioEstandardMostralPerUsuari.txt"));
 		b.write("idUsuari, desviacioEstMostral");
@@ -487,6 +500,21 @@ public class ConnexioDB {
 		System.out.println("El fitxer desviacioEstandardMostralPerUsuari.txt s'ha creat correctament.");
 	}
 	
+	/**
+	 * Mètode que permet escriure totes les puntuacions
+	 * @param resultat llistat solució
+	 * @throws Exception error entrada/sortida
+	 */
+	private static void escriureResultat_totesPuntuacionsDB(List<Double> resultat) throws Exception{
+		BufferedWriter b = new BufferedWriter(new FileWriter("totesPuntuacions.txt"));
+		for(Double r : resultat) {
+			b.write(String.valueOf(r));
+			b.newLine();
+		}
+		b.close();
+		System.out.println("El fitxer totesPuntuacions.txt s'ha creat correctament.");
+	}
+		
 	public static void main (String[] args) {
 		
 		Connection connexio=null;
@@ -541,6 +569,8 @@ public class ConnexioDB {
 			
 			System.out.println(estudi.puntuacioMesBaixa()+" puntuacio mes baixa de totes ."); // -9.95 mes baixa
 			
+			System.out.println(estudi.desviacioEstandardPoblacionalTotal()); //5.295298872927734
+			
 			escriureResultat_mitjanaPuntuacioCadaRestaurant(estudi.mitjanaPuntuacioCadaRestaurant());
 			
 			escriureResultat_desviacioAbsolutaPuntuacioRestaurants(estudi.desviacioAbsolutaPuntuacioRestaurants());
@@ -572,9 +602,9 @@ public class ConnexioDB {
 			escriureResultat_desviacioEstandardPoblacionalPerUsuari(estudi.desviacioEstandardPoblacionalPerUsuari());
 			
 			
-			escriureResultat_desviacioEstandardMostralPerUsuari(estudi.desviacioEstandardMostralPerUsuari());
+			escriureResultat_desviacioEstandardMostralPerUsuari(estudi.desviacioEstandardMostralPerUsuari());		
 			
-			
+			escriureResultat_totesPuntuacionsDB(estudi.totesPuntuacions());
 			
 		}catch(Exception e) {
 			System.out.println(e);
